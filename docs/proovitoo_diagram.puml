@@ -1,0 +1,87 @@
+@startuml
+
+actor User
+participant "Application" as App
+database "Database" as Db
+
+autonumber
+== Displaying initial status ==
+User -> App : Open app
+
+activate App
+App -> Db : Retrieve available tables
+activate Db
+Db --> App
+deactivate Db
+App -> User : Display available tables
+
+deactivate App
+
+== Reservation filtering and recommendation ==
+User -> App : Apply filters
+
+group Filtering
+
+activate App
+App -> User : Display filtered tables
+
+else Recommendation conditions met
+
+App -> App : Determine recommendation
+note right
+    Recommendation will be
+    determined when user has
+    selected filters for party
+    size and reservation time
+end note
+App -> User : Highlight recommendation
+deactivate App
+
+end group
+
+== Making a reservation ==
+User -> App : Select table
+activate App
+App -> Db : Retrieve table reservation info
+activate Db
+
+Db --> App
+deactivate Db
+App -> User : Display table reservation info
+note right
+    Reservation info - when
+    the selected table is available
+    and when not, displayed on
+    a separate viewbox
+end note
+deactivate App
+User -> App : Make reservation
+
+activate App
+
+group Confirm reservation [Successful case]
+
+App -> Db : Reserve table if available
+activate Db
+note right
+    Recheck through database
+    to make sure the table hasn't
+    been reserved in the meantime
+end note
+Db --> App : Table reserved
+deactivate Db
+App -> User : Confirm reservation made
+
+else Table unavailable case
+autonumber 14
+App -> Db : Reserve table if available
+activate Db
+Db --> App : Table not available
+deactivate Db
+App -> User : Display error
+App -> User : Refresh table reservation info
+
+deactivate App
+
+end group
+@enduml
