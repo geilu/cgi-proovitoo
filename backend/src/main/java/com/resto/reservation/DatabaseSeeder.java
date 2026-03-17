@@ -42,10 +42,14 @@ public class DatabaseSeeder implements CommandLineRunner {
             RestaurantTable table1 = new RestaurantTable();
             table1.setTableNumber(2);
             table1.setCapacity(4);
+            table1.setX(1);
+            table1.setY(1);
 
             RestaurantTable table2 = new RestaurantTable();
             table2.setTableNumber(1);
             table2.setCapacity(6);
+            table2.setX(2);
+            table2.setY(2);
 
             tableRepo.save(table1);
             tableRepo.save(table2);
