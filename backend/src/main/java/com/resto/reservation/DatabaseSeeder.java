@@ -11,9 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +59,25 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         generateRandomReservations(3, r, tables);
 
+        // + one ongoing reservation
+        Reservation reservation = new Reservation();
+
+        User user = new User();
+        user.setFirstName("Name");
+        user.setLastName("LastName");
+        userRepo.save(user);
+        reservation.setUser(user);
+
+        reservation.setGuestCount(4);
+
+        reservation.setStartTime(LocalDateTime.now().minusHours(1L).atZone(ZoneOffset.UTC));
+        reservation.setEndTime(LocalDateTime.now().plusMinutes(30L).atZone(ZoneOffset.UTC));
+
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservation.setRestaurantTable(tables.get(r.nextInt(tables.size())));
+
+        reservationRepo.save(reservation);
+
         LOGGER.log(Level.INFO, "Dummy data added to database");
     }
 
@@ -83,11 +100,11 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             long millis = r.nextInt(millisInDay);
             LocalTime time = new Time(millis).toLocalTime();
-            reservation.setStartTime(LocalDateTime.of(date, time));
+            reservation.setStartTime(ZonedDateTime.of(date, time, ZoneOffset.UTC));
 
             long endMillis = millis + durationMillis;
             LocalTime endTime = new Time(endMillis).toLocalTime();
-            reservation.setEndTime(LocalDateTime.of(date, endTime));
+            reservation.setEndTime(ZonedDateTime.of(date, endTime, ZoneOffset.UTC));
 
             reservation.setStatus(ReservationStatus.CONFIRMED);
 

@@ -4,7 +4,7 @@ package com.resto.reservation.entity;
 import com.resto.reservation.entity.enums.ReservationStatus;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "reservations")
@@ -22,10 +22,10 @@ public class Reservation {
     private Integer guestCount;
 
     @Column(name="start_time", nullable = false)
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     @Column(name="end_time", nullable = false)
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
 
     @ManyToOne
     @JoinColumn(name="reservation_table", nullable = false)
@@ -57,19 +57,19 @@ public class Reservation {
         this.guestCount = guestCount;
     }
 
-    public LocalDateTime getStartTime() {
+    public ZonedDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(ZonedDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public ZonedDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(ZonedDateTime endTime) {
         this.endTime = endTime;
     }
 
