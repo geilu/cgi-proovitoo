@@ -20,7 +20,7 @@ public class RestaurantTableController {
         this.tableRepo = tableRepo;
     }
 
-    @GetMapping
+    @GetMapping("/availableat")
     public ResponseEntity<List<RestaurantTable>> getAvailableTablesDuring(@RequestParam("time") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime time) {
         ZonedDateTime utc = time.withZoneSameInstant(ZoneOffset.UTC);
         return ResponseEntity.ok(tableRepo.findAvailableTablesAtTime(utc));
