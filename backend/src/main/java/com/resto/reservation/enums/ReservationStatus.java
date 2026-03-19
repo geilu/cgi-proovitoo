@@ -1,4 +1,4 @@
-package com.resto.reservation.entity.enums;
+package com.resto.reservation.enums;
 
 public enum ReservationStatus {
     PENDING,

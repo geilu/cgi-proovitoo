@@ -1,7 +1,7 @@
 package com.resto.reservation.entity;
 
 
-import com.resto.reservation.entity.enums.ReservationStatus;
+import com.resto.reservation.enums.ReservationStatus;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;

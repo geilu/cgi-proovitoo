@@ -19,4 +19,13 @@ public interface RestaurantTableRepository extends JpaRepository<RestaurantTable
     )
     """)
     List<RestaurantTable> findAvailableTablesAtTime(@Param("time")ZonedDateTime time);
+
+    List<RestaurantTable> getByCapacityGreaterThanEqual(Integer groupSize);
+
+    @Query("""
+    SELECT t FROM RestaurantTable t
+        WHERE :minX <= t.x AND t.x <= :maxX
+            AND :minY <= t.y AND t.y <= :maxY
+    """)
+    List<RestaurantTable> getByPositionIn(@Param("minX") int minX, @Param("minY") int minY, @Param("maxX") int maxX, @Param("maxY") int maxY);
 }

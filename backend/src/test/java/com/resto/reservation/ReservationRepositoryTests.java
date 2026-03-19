@@ -3,7 +3,7 @@ package com.resto.reservation;
 import com.resto.reservation.entity.Reservation;
 import com.resto.reservation.entity.RestaurantTable;
 import com.resto.reservation.entity.User;
-import com.resto.reservation.entity.enums.ReservationStatus;
+import com.resto.reservation.enums.ReservationStatus;
 import com.resto.reservation.repository.ReservationRepository;
 import com.resto.reservation.repository.RestaurantTableRepository;
 import com.resto.reservation.repository.UserRepository;

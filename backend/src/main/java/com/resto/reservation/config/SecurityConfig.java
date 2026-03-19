@@ -1,4 +1,4 @@
-package com.resto.reservation;
+package com.resto.reservation.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
