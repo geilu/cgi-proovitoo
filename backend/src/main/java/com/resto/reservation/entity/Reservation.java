@@ -28,7 +28,7 @@ public class Reservation {
     private ZonedDateTime endTime;
 
     @ManyToOne
-    @JoinColumn(name="reservation_table", nullable = false)
+    @JoinColumn(name="restaurant_table", nullable = false)
     private RestaurantTable restaurantTable;
 
     @Enumerated(EnumType.STRING)
