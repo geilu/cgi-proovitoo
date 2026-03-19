@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Repository
@@ -16,4 +17,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                         WHERE r.restaurantTable = :restaurantTable
             """)
     List<Object> getTimesByRestaurantTable(@Param("restaurantTable") RestaurantTable restaurantTable);
+
+    @Query("""
+        SELECT COUNT(r) FROM Reservation r
+                WHERE r.restaurantTable = :restaurantTable
+                AND r.startTime < :newEndTime AND r.endTime > :newStartTime
+        """)
+    int countOverlappingReservations(@Param("restaurantTable") RestaurantTable restaurantTable,
+                                                            @Param("newStartTime") ZonedDateTime newStartTime,
+                                                            @Param("newEndTime") ZonedDateTime newEndTime);
 }
