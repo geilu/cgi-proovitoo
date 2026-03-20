@@ -1,5 +1,6 @@
 package com.resto.reservation.controller;
 
+import com.resto.reservation.entity.FilteredTableResponse;
 import com.resto.reservation.entity.RestaurantTable;
 import com.resto.reservation.enums.UserPreferences;
 import com.resto.reservation.repository.RestaurantTableRepository;
@@ -31,9 +32,16 @@ public class RestaurantTableController {
     }
 
     @GetMapping("/filtered")
-    public ResponseEntity<List<RestaurantTable>> getFilteredTables(@RequestParam(value = "time", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime time,
-                                                                                                                @RequestParam(value = "userPreferences", required = false) List<UserPreferences> userPreferences,
-                                                                                                                @RequestParam(value = "groupSize", required = false) Integer groupSize) {
-        return ResponseEntity.ok(restaurantTableService.filterTables(time, userPreferences, groupSize));
+    public ResponseEntity<FilteredTableResponse> getFilteredTables(@RequestParam(value = "time", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime time,
+                                                                   @RequestParam(value = "userPreferences", required = false) List<UserPreferences> userPreferences,
+                                                                   @RequestParam(value = "groupSize", required = false) Integer groupSize) {
+
+        List<RestaurantTable> filteredTables = restaurantTableService.filterTables(time, userPreferences, groupSize);
+        RestaurantTable recommendedTable = null;
+
+        if (time != null && groupSize != null && !filteredTables.isEmpty()) {
+            recommendedTable = restaurantTableService.getRecommendedTable(filteredTables, userPreferences);
+        }
+        return ResponseEntity.ok(new FilteredTableResponse(filteredTables, recommendedTable));
     }
 }

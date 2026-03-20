@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RestaurantTableServiceTests {
+class RestaurantTableServiceTests {
 
     @Mock
     private RestaurantTableRepository restaurantTableRepo;
@@ -62,7 +62,7 @@ public class RestaurantTableServiceTests {
     }
 
     @Test
-    void allNullReturnsEmpty() {
+    void filterTables_allNullReturnsEmpty() {
         List<RestaurantTable> result = restaurantTableService.filterTables(null, null, null);
 
         assertTrue(result.isEmpty());
@@ -70,7 +70,7 @@ public class RestaurantTableServiceTests {
     }
 
     @Test
-    void groupSizeOnly() {
+    void filterTables_groupSizeOnly() {
         when(restaurantTableRepo.getByCapacityGreaterThanEqual(4)).thenReturn(List.of(table1, table2));
 
         List<RestaurantTable> result = restaurantTableService.filterTables(null, null, 4);
@@ -81,7 +81,7 @@ public class RestaurantTableServiceTests {
     }
 
     @Test
-    void timeOnly() {
+    void filterTables_timeOnly() {
         when(restaurantTableRepo.findAvailableTablesAtTime(testTime)).thenReturn(List.of(table1, table3));
 
         List<RestaurantTable> result = restaurantTableService.filterTables(testTime, null, null);
@@ -93,7 +93,7 @@ public class RestaurantTableServiceTests {
     }
 
     @Test
-    void preferencesOnly() {
+    void filterTables_preferencesOnly() {
         UserPreferences preference = UserPreferences.QUIET;
         ZoneConfig.Bounds bounds = new ZoneConfig.Bounds();
         bounds.setxMax(6);
@@ -110,7 +110,7 @@ public class RestaurantTableServiceTests {
     }
 
     @Test
-    void multiplePreferences() {
+    void filterTables_multiplePreferences() {
         List<UserPreferences> preferences = List.of(UserPreferences.QUIET, UserPreferences.TERRACE);
         ZoneConfig.Bounds quietBounds = new ZoneConfig.Bounds();
         quietBounds.setxMax(6);
@@ -136,17 +136,20 @@ public class RestaurantTableServiceTests {
     }
 
     @Test
-    void groupSizeAndTime() {
+    void filterTables_groupSizeAndTime() {
         when(restaurantTableRepo.getByCapacityGreaterThanEqual(4)).thenReturn(List.of(table1, table2));
         when(restaurantTableRepo.findAvailableTablesAtTime(testTime)).thenReturn(List.of(table2, table3));
 
         List<RestaurantTable> result = restaurantTableService.filterTables(testTime, null, 4);
 
         assertThat(result).containsExactly(table2);
+
+        RestaurantTable recommended = restaurantTableService.getRecommendedTable(result, null);
+        assertThat(recommended).isEqualTo(table2);
     }
 
     @Test
-    void timeAndPreferenceNoIntersection() {
+    void filterTables_timeAndPreferenceNoIntersection() {
         UserPreferences preference = UserPreferences.TERRACE;
         ZoneConfig.Bounds bounds = new ZoneConfig.Bounds();
         bounds.setxMax(6);
@@ -161,5 +164,67 @@ public class RestaurantTableServiceTests {
         List<RestaurantTable> result = restaurantTableService.filterTables(testTime, List.of(preference), null);
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getRecommendedTable_nullWhenFilteredTablesEmpty() {
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(), null);
+        assertNull(result);
+    }
+
+    @Test
+    void getRecommendedTable_noPreferences() {
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), null);
+        assertEquals(result, table1);
+    }
+
+    @Test
+    void getRecommendedTable_withPreferences() {
+        List<UserPreferences> userPreferences = List.of(UserPreferences.QUIET);
+        ZoneConfig.Bounds bounds = new ZoneConfig.Bounds();
+        bounds.setxMin(4);
+        bounds.setxMax(6);
+        bounds.setyMin(3);
+        bounds.setyMax(6);
+        when(zoneService.getZoneBounds("QUIET")).thenReturn(bounds);
+        when(restaurantTableRepo.getByPositionIn(4, 3, 6, 6)).thenReturn(List.of(table3));
+        when(restaurantTableService.applyUserPreferenceFilter(List.of(table2, table3), userPreferences)).thenReturn(List.of(table3));
+
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table2, table3), userPreferences);
+
+        assertEquals(result, table3);
+    }
+
+    @Test
+    void getRecommendedTable_preferencesNoMatch() {
+        List<UserPreferences> userPreferences = List.of(UserPreferences.QUIET);
+        ZoneConfig.Bounds bounds = new ZoneConfig.Bounds();
+        bounds.setxMin(4);
+        bounds.setxMax(6);
+        bounds.setyMin(3);
+        bounds.setyMax(6);
+        when(zoneService.getZoneBounds("QUIET")).thenReturn(bounds);
+        when(restaurantTableRepo.getByPositionIn(4, 3, 6, 6)).thenReturn(List.of());
+        when(restaurantTableService.applyUserPreferenceFilter(List.of(table1, table2), userPreferences)).thenReturn(List.of());
+
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), userPreferences);
+        assertEquals(result, table1);
+    }
+
+    @Test
+    void getRecommendedTable_preferencesMostEfficient() {
+        List<UserPreferences> userPreferences = List.of(UserPreferences.TERRACE);
+        ZoneConfig.Bounds bounds = new ZoneConfig.Bounds();
+        bounds.setxMin(1);
+        bounds.setxMax(6);
+        bounds.setyMin(1);
+        bounds.setyMax(2);
+        when(zoneService.getZoneBounds("TERRACE")).thenReturn(bounds);
+        when(restaurantTableRepo.getByPositionIn(1, 1, 6, 2)).thenReturn(List.of(table1, table2));
+        when(restaurantTableService.applyUserPreferenceFilter(List.of(table1, table2), userPreferences)).thenReturn(List.of(table1, table2));
+
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), userPreferences);
+
+        assertEquals(result, table1);
     }
 }

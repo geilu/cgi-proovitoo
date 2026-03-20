@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RestaurantTableService {
@@ -34,25 +36,46 @@ public class RestaurantTableService {
             } else {
                 filteredTables = filteredTables.stream()
                         .filter(availableTables::contains)
-                        .toList();
+                        .collect(Collectors.toList());
             }
         }
 
         if (userPreferences != null && !userPreferences.isEmpty()) {
             // add up all tables within preferred zones, then determine what tables match with other conditions
-            List<RestaurantTable> preferredTables = new ArrayList<>();
-            for (UserPreferences preference : userPreferences) {
-                ZoneConfig.Bounds zoneBounds = zoneService.getZoneBounds(preference.name());
-                preferredTables.addAll(restaurantTableRepo.getByPositionIn(zoneBounds.getxMin(), zoneBounds.getyMin(), zoneBounds.getxMax(), zoneBounds.getyMax()));
-            }
+            filteredTables = applyUserPreferenceFilter(filteredTables, userPreferences);
+        }
 
-            if (filteredTables.isEmpty()) {
-                filteredTables.addAll(preferredTables);
-            } else {
-                filteredTables = filteredTables.stream()
-                        .filter(preferredTables::contains)
-                        .toList();
+        return filteredTables;
+    }
+
+    public RestaurantTable getRecommendedTable(List<RestaurantTable> filteredTables, List<UserPreferences> userPreferences) {
+        List<RestaurantTable> tableList = filteredTables;
+
+        if (userPreferences != null && !userPreferences.isEmpty()) {
+            List<RestaurantTable> preferredTables = applyUserPreferenceFilter(filteredTables, userPreferences);
+            if (!preferredTables.isEmpty()) {
+                tableList = preferredTables;
             }
+        }
+
+        return tableList.stream()
+                .min(Comparator.comparingInt(RestaurantTable::getCapacity))
+                .orElse(null);
+    }
+
+    public List<RestaurantTable> applyUserPreferenceFilter(List<RestaurantTable> filteredTables, List<UserPreferences> userPreferences) {
+        List<RestaurantTable> preferredTables = new ArrayList<>();
+        for (UserPreferences preference : userPreferences) {
+            ZoneConfig.Bounds zoneBounds = zoneService.getZoneBounds(preference.name());
+            preferredTables.addAll(restaurantTableRepo.getByPositionIn(zoneBounds.getxMin(), zoneBounds.getyMin(), zoneBounds.getxMax(), zoneBounds.getyMax()));
+        }
+
+        if (filteredTables.isEmpty()) {
+            return new ArrayList<>(preferredTables);
+        } else {
+            filteredTables = filteredTables.stream()
+                    .filter(preferredTables::contains)
+                    .collect(Collectors.toList());
         }
 
         return filteredTables;
