@@ -1,6 +1,6 @@
 package com.resto.reservation.controller;
 
-import com.resto.reservation.entity.FilteredTableResponse;
+import com.resto.reservation.entity.responseobjects.FilteredTableResponse;
 import com.resto.reservation.entity.RestaurantTable;
 import com.resto.reservation.enums.UserPreferences;
 import com.resto.reservation.repository.RestaurantTableRepository;

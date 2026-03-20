@@ -1,6 +1,7 @@
-package com.resto.reservation.entity;
+package com.resto.reservation.entity.responseobjects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.resto.reservation.entity.RestaurantTable;
 
 import java.util.List;
 

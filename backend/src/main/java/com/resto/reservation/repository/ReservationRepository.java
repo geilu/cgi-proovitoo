@@ -2,6 +2,7 @@ package com.resto.reservation.repository;
 
 import com.resto.reservation.entity.Reservation;
 import com.resto.reservation.entity.RestaurantTable;
+import com.resto.reservation.entity.responseobjects.ReservationResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,10 +14,10 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     @Query("""
-            SELECT (r.id, r.startTime, r.endTime) FROM Reservation r
+            SELECT new com.resto.reservation.entity.responseobjects.ReservationResponse(r.id, r.startTime, r.endTime) FROM Reservation r
                         WHERE r.restaurantTable = :restaurantTable
             """)
-    List<Object> getTimesByRestaurantTable(@Param("restaurantTable") RestaurantTable restaurantTable);
+    List<ReservationResponse> getTimesByRestaurantTable(@Param("restaurantTable") RestaurantTable restaurantTable);
 
     @Query("""
         SELECT COUNT(r) FROM Reservation r

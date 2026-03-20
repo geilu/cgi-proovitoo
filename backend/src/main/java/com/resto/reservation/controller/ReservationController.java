@@ -2,6 +2,7 @@ package com.resto.reservation.controller;
 
 import com.resto.reservation.entity.Reservation;
 import com.resto.reservation.entity.RestaurantTable;
+import com.resto.reservation.entity.responseobjects.ReservationResponse;
 import com.resto.reservation.repository.ReservationRepository;
 import com.resto.reservation.service.ReservationService;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ReservationController {
     }
 
     @GetMapping("/oftable")
-    public ResponseEntity<List<Object>> getTableReservations(@RequestParam("table") RestaurantTable table) {
+    public ResponseEntity<List<ReservationResponse>> getTableReservations(@RequestParam("table") RestaurantTable table) {
         return ResponseEntity.ok(reservationRepo.getTimesByRestaurantTable(table));
     }
 
