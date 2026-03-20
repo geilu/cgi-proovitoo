@@ -39,17 +39,19 @@ public class RestaurantTableService {
         }
 
         if (userPreferences != null && !userPreferences.isEmpty()) {
+            // add up all tables within preferred zones, then determine what tables match with other conditions
+            List<RestaurantTable> preferredTables = new ArrayList<>();
             for (UserPreferences preference : userPreferences) {
                 ZoneConfig.Bounds zoneBounds = zoneService.getZoneBounds(preference.name());
-                List<RestaurantTable> preferredTables = restaurantTableRepo.getByPositionIn(zoneBounds.getxMin(), zoneBounds.getyMin(), zoneBounds.getxMax(), zoneBounds.getyMax());
+                preferredTables.addAll(restaurantTableRepo.getByPositionIn(zoneBounds.getxMin(), zoneBounds.getyMin(), zoneBounds.getxMax(), zoneBounds.getyMax()));
+            }
 
-                if (filteredTables.isEmpty()) {
-                    filteredTables.addAll(preferredTables);
-                } else {
-                    filteredTables = filteredTables.stream()
-                            .filter(preferredTables::contains)
-                            .toList();
-                }
+            if (filteredTables.isEmpty()) {
+                filteredTables.addAll(preferredTables);
+            } else {
+                filteredTables = filteredTables.stream()
+                        .filter(preferredTables::contains)
+                        .toList();
             }
         }
 
