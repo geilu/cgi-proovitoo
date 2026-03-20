@@ -44,7 +44,7 @@ class ReservationControllerTests {
         when(reservationService.overlapsExistingReservation(newReservation)).thenReturn(false);
         when(reservationRepo.save(any(Reservation.class))).thenReturn(newReservation);
 
-        Reservation result = reservationController.addReservation(newReservation);
+        Reservation result = reservationController.addReservation(newReservation).getBody();
 
         assertNotNull(result);
         verify(reservationRepo, times(1)).save(newReservation);

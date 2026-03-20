@@ -3,6 +3,7 @@ package com.resto.reservation.controller;
 import com.resto.reservation.entity.Reservation;
 import com.resto.reservation.entity.RestaurantTable;
 import com.resto.reservation.entity.responseobjects.ReservationResponse;
+import com.resto.reservation.exceptions.RestaurantException;
 import com.resto.reservation.repository.ReservationRepository;
 import com.resto.reservation.service.ReservationService;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +33,12 @@ public class ReservationController {
     }
 
     @PostMapping()
-    public Reservation addReservation(@RequestBody Reservation newReservation) {
+    public ResponseEntity<Reservation> addReservation(@RequestBody Reservation newReservation) {
         if (reservationService.overlapsExistingReservation(newReservation)) {
-            throw new IllegalArgumentException("Reservation overlaps another");
+            throw new RestaurantException("Reservation overlaps another");
         }
         Reservation savedReservation = reservationRepo.save(newReservation);
         LOGGER.log(Level.INFO, String.format("Reservation with id %s made", savedReservation.getId()));
-        return savedReservation;
+        return ResponseEntity.ok(savedReservation);
     }
 }
