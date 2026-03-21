@@ -33,6 +33,26 @@ public class RestaurantTableController {
         this.restaurantTableService = restaurantTableService;
     }
 
+    @Operation(summary = "Get a list of all tables",
+    description = "Returns all tables",
+    responses = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved all tables",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(
+                                        implementation = RestaurantTable.class
+                                    )
+                            )
+                    )
+            )
+    })
+    @GetMapping("/all")
+    public ResponseEntity<List<RestaurantTable>> getAllTables() {
+        return ResponseEntity.ok(tableRepo.findAll());
+    }
+
     @Operation(summary = "Get a list of available tables during a specified time",
             description = "Returns all tables that have no overlapping reservations at the given timestamp. Time must be provided in ISO 8601 format with timezone offset (e.g 2026-21-03T19:00:00+02:00)",
             responses = {
