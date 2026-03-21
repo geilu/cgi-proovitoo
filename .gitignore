@@ -1,3 +1,4 @@
 .idea
 restaurant.db
 backend/test-db.db
+frontend/node_modules/
