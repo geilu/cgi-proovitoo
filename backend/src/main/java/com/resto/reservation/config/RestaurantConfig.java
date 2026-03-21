@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @ConfigurationProperties(prefix = "restaurant")
 @Configuration
@@ -64,6 +65,9 @@ public class RestaurantConfig {
     }
 
     private ZonedDateTime toZonedToday(String time) {
+        Objects.requireNonNull(time, "Restaurant time config is not set - check application.properties");
+        Objects.requireNonNull(timezone, "Restaurant timezone config is not set - check application.properties");
+
         LocalTime localTime = LocalTime.parse(time);
         return ZonedDateTime.of(LocalDate.now(getZoneId()), localTime, getZoneId());
     }

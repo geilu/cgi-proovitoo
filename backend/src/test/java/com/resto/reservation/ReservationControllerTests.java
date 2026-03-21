@@ -2,6 +2,7 @@ package com.resto.reservation;
 
 import com.resto.reservation.controller.ReservationController;
 import com.resto.reservation.entity.Reservation;
+import com.resto.reservation.exceptions.RestaurantException;
 import com.resto.reservation.repository.ReservationRepository;
 import com.resto.reservation.service.ReservationService;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class ReservationControllerTests {
         Reservation newReservation = new Reservation();
         when(reservationService.overlapsExistingReservation(newReservation)).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        RestaurantException exception = assertThrows(RestaurantException.class, () -> {
             reservationController.addReservation(newReservation);
         });
 

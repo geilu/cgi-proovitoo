@@ -8,6 +8,7 @@ import com.resto.reservation.enums.ReservationStatus;
 import com.resto.reservation.repository.ReservationRepository;
 import com.resto.reservation.repository.RestaurantTableRepository;
 import com.resto.reservation.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,9 @@ import java.util.logging.Logger;
 
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
+
+    @Value("${app.seed-data:false}") // only seed when enabled (e.g disabled for tests. configure in the respective application.properties)
+    private boolean seedData;
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseSeeder.class.getName());
     private final Random r = new Random();
@@ -41,7 +45,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
+        if (!seedData) return;
         if (tableRepo.count() == 0) { // dont add these if table isn't empty
             RestaurantTable table1 = new RestaurantTable();
             table1.setTableNumber(2);
