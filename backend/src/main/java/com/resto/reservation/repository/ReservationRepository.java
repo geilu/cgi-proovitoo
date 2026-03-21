@@ -16,7 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
             SELECT new com.resto.reservation.entity.responseobjects.ReservationResponse(r.id, r.startTime, r.endTime) FROM Reservation r
                         WHERE r.restaurantTable = :restaurantTable
-            """)
+        """)
     List<ReservationResponse> getTimesByRestaurantTable(@Param("restaurantTable") RestaurantTable restaurantTable);
 
     @Query("""
