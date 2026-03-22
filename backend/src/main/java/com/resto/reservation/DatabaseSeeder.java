@@ -47,59 +47,73 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (!seedData) return;
-        if (tableRepo.count() == 0) { // dont add these if table isn't empty
-            RestaurantTable table1 = new RestaurantTable();
-            table1.setTableNumber(2);
-            table1.setCapacity(4);
-            table1.setX(1);
-            table1.setY(1);
+        if (tableRepo.count() == 0) { // add tables on first load
+            List<RestaurantTable> tables = List.of(
+                    // x coordinate: column, y coordinate: row. point 1,1 is bottom left corner
+                    // terrace area
+                    createTable(1, 4, 1, 1),
+                    createTable(2, 4, 2, 1),
+                    createTable(3, 6, 3, 1),
+                    createTable(4, 2, 4, 1),
 
-            RestaurantTable table2 = new RestaurantTable();
-            table2.setTableNumber(1);
-            table2.setCapacity(6);
-            table2.setX(2);
-            table2.setY(2);
+                    createTable(5, 6, 1, 2),
+                    createTable(6, 4, 2, 2),
+                    createTable(7, 4, 3, 2),
+                    createTable(8, 2, 4, 2),
+                    // children area
+                    createTable(9, 4, 1, 3),
+                    createTable(10, 4, 2, 3),
+                    createTable(11, 4, 3, 3),
 
-            tableRepo.save(table1);
-            tableRepo.save(table2);
+                    createTable(12, 6, 1, 4),
+                    createTable(14, 8, 2, 4),
+                    createTable(15, 6, 3, 4),
+
+                    createTable(19, 6, 1, 5),
+                    createTable(20, 8, 2, 5),
+                    createTable(21, 6, 3, 5),
+
+                    createTable(25, 4, 1, 6),
+                    createTable(26, 4, 2, 6),
+                    createTable(27, 4, 3, 6),
+                    // quiet area
+                    createTable(13, 4, 4, 3),
+
+                    createTable(16, 4, 4, 4),
+                    createTable(17, 2, 5, 4),
+                    createTable(18, 2, 6, 4),
+
+                    createTable(22, 4, 4, 5),
+                    createTable(23, 2, 5, 5),
+                    createTable(24, 2, 6, 5),
+
+                    createTable(28, 4, 4, 6),
+                    createTable(29, 2, 5, 6),
+                    createTable(30, 2, 6, 6)
+            );
+
+            tableRepo.saveAll(tables);
         }
 
-        reservationRepo.deleteAll(); // clear reservations
+        reservationRepo.deleteAll(); // clear reservations and users
+        userRepo.deleteAll();
 
         List<RestaurantTable> tables = tableRepo.findAll();
-
-        generateRandomReservations(5, r, tables);
-
-        // + one ongoing reservation
-        Reservation reservation = new Reservation();
-
-        User user = new User();
-        user.setFirstName("Name");
-        user.setLastName("LastName");
-        userRepo.save(user);
-        reservation.setUser(user);
-
-        reservation.setGuestCount(4);
-
-        reservation.setStartTime(LocalDateTime.now().minusHours(1L).atZone(ZoneOffset.UTC));
-        reservation.setEndTime(LocalDateTime.now().plusHours(1L).atZone(ZoneOffset.UTC));
-
-        reservation.setStatus(ReservationStatus.CONFIRMED);
-        reservation.setRestaurantTable(tables.get(r.nextInt(tables.size())));
-
-        reservationRepo.save(reservation);
+        // reservations for three upcoming days
+        generateRandomReservations(20, r, tables, 0);
+        generateRandomReservations(10, r, tables, 1);
+        generateRandomReservations(5, r, tables, 2);
 
         LOGGER.log(Level.INFO, "Dummy data added to database");
     }
 
-    private void generateRandomReservations(int count, Random r, List<RestaurantTable> tables) {
-        userRepo.deleteAll();
+    private void generateRandomReservations(int count, Random r, List<RestaurantTable> tables, long daysAhead) {
         User user = new User();
         user.setFirstName("Aadu");
         user.setLastName("Beedu");
         userRepo.save(user);
 
-        LocalDate date = LocalDate.now();
+        LocalDate date = LocalDate.now().plusDays(daysAhead);
 
         long durationSeconds = TimeUnit.MINUTES.toSeconds(120);
 
@@ -147,5 +161,14 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private boolean overlapping(ZonedDateTime newStartTime, ZonedDateTime newEndTime, ReservationSlot existing) {
         return newStartTime.isBefore(existing.endTime) && newEndTime.isAfter(existing.startTime);
+    }
+
+    private RestaurantTable createTable(int tableNumber, int capacity, int x, int y) {
+        RestaurantTable table = new RestaurantTable();
+        table.setTableNumber(tableNumber);
+        table.setCapacity(capacity);
+        table.setX(x);
+        table.setY(y);
+        return table;
     }
 }
