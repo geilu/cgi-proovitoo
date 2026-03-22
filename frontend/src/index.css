@@ -13,5 +13,8 @@
 }
 
 .active {
-    filter: brightness(115%);
+    color: white;
+}
+.active img {
+    filter: brightness(0.4);
 }

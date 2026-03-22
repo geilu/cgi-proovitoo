@@ -1,4 +1,4 @@
-import {SetStateAction, useState} from 'react';
+import {useState} from 'react';
 
 import FilterBlock from "./components/filterBlock.tsx";
 import ReservationInfoBlock from "./components/reservationInfoBlock.tsx";
@@ -61,9 +61,14 @@ function App() {
                             <div className="p-[1em] px-[1.3em] bg-green-500 rounded-lg text-xs font-bold">4</div>
                             <p className="mt-[0.5em]">Recommended</p>
                         </div>
+                        <div className="flex flex-row gap-[0.5em] text-center">
+                            <div className="relative inline-flex items-center justify-center p-[1em] px-[1.3em] rounded-lg text-xs font-bold text-white
+                            before:absolute before:inset-0 before:rounded-lg before:bg-gray-400 before:brightness-[0.4] before:-z-10">4</div>
+                            <p className="mt-[0.5em]">Selected</p>
+                        </div>
                     </div>
 
-                    <div id="grid-container" className="flex p-[1.5em] h-[40em] bg-gray-300 rounded-xl">
+                    <div id="grid-container" className="flex p-[1.5em] h-[40em] bg-[#d6dae3] rounded-xl">
                         <RestaurantPlan onSelect={handleSelect}
                                         filteredIds={filterResult?.filteredTables.map(t => t.id) ?? null}
                                         recommendedId={filterResult?.recommendedTable?.id ?? null}/>
@@ -71,10 +76,10 @@ function App() {
                 </div>
 
                 <div id="layout-right" className="flex flex-col gap-[2em]">
-                    <div id="filter-container" className="bg-red-400 rounded-xl h-full w-full p-[2em]">
+                    <div id="filter-container" className="h-full w-full">
                         <FilterBlock onFilter={setFilterResult} />
                     </div>
-                    <div id="reservation-info-container" className="bg-blue-400 rounded-xl h-full w-full p-[2em] text-center content-center">
+                    <div id="reservation-info-container" className="bg-blue-400 rounded-xl h-full w-full min-w-[26em] p-[2em] text-center content-center">
                         {loadReservationInfo()}
                     </div>
                     <button className="p-[2em] rounded-xl bg-blue-500"
