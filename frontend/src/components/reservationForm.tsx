@@ -118,91 +118,105 @@ export default function ReservationForm({
         }
     }
 
-    const inputCls = "border-[2px] rounded px-2 py-1 text-sm w-full";
-    const errorCls = "col-span-2 text-xs text-red-600 -mt-3 text-right";
-
-    const panelCls = `p-[2em] h-[100vh] content-center bg-gray-300 fixed right-0 top-0 ml-auto mr-0
-        transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "translate-x-full"}`;
+    const panelCls = `p-6 h-[55vh] bg-[#d6dae3] fixed left-0 bottom-0 flex flex-col gap-4 justify-center
+        transition-transform duration-300 ease-in-out w-[24em] shadow-2xl rounded-2xl
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}`;
 
     if (submitted) {
         return (
             <div className={panelCls}>
-                <div className="text-center flex flex-col gap-3">
-                    <h1 className="text-2xl font-bold">Reservation confirmed!</h1>
-                    <p className="text-sm text-gray-600">
-                        Table {selectedTable?.tableNumber} · {date} · {startTime}–{
+                <div className="bg-[#c8cdd8] rounded-2xl px-4 py-3 flex flex-col gap-1 text-center">
+                    <span className="text-xs font-semibold text-[#5a6070] uppercase tracking-widest">Confirmed</span>
+                    <span className="text-[#2e3340] font-semibold text-sm">
+                    Table {selectedTable?.tableNumber} · {date} · {startTime}–{
                         (() => {
                             const end = new Date(new Date(`${date}T${startTime}`).getTime() + 2 * 60 * 60 * 1000);
                             return end.toTimeString().slice(0, 5);
                         })()
                     } · {guestCount} guests
-                    </p>
+                </span>
                 </div>
+
+                {onCancel && (
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="w-full py-3 rounded-2xl font-semibold text-sm tracking-wide bg-[#c8cdd8] text-[#3a3f4a] hover:bg-[#bcc2ce] active:scale-[0.98] transition-all duration-150"
+                    >
+                        Close
+                    </button>
+                )}
             </div>
         );
     }
 
     return (
         <div className={panelCls}>
-            <h1 className="text-2xl font-bold text-center mb-[1em]">Make reservation</h1>
-            <div className="grid grid-cols-2 w-full gap-4 text-center items-center">
+            <h1 className="font-semibold text-[#3a3f4a] text-lg tracking-wide">Make Reservation</h1>
 
-                <label className="font-bold" htmlFor="form-selected-table-fied">Table</label>
-                <input
-                    id="form-selected-table-field"
-                    className={inputCls}
-                    value={selectedTable ? `#${selectedTable.tableNumber} (${selectedTable.capacity} seats)` : "Select a table from the plan"}
-                    readOnly
-                />
+            <div className="flex flex-col gap-3">
 
-                <label className="font-bold" htmlFor="form-reservation-date-field">Date</label>
-                <input
-                    id="form-reservation-date-field"
-                    className={inputCls}
-                    type="date"
-                    value={date}
-                    min={new Date().toISOString().slice(0, 10)}
-                    onChange={e => setDate(e.target.value)}
-                />
+                <div className="bg-[#c8cdd8] rounded-2xl px-4 py-3 flex flex-col gap-1">
+                    <label htmlFor="form-selected-table-field" className="text-xs font-semibold text-[#5a6070] uppercase tracking-widest">Table</label>
+                    <input
+                        id="form-selected-table-field"
+                        value={selectedTable ? `#${selectedTable.tableNumber} (${selectedTable.capacity} seats)` : "Select a table from the plan"}
+                        readOnly
+                        className="bg-transparent text-[#2e3340] font-medium text-sm outline-none w-full"
+                    />
+                </div>
 
-                <label className="font-bold" htmlFor="form-reservation-time-field">Time</label>
-                <input
-                    id="form-reservation-time-field"
-                    className={inputCls}
-                    type="time"
-                    value={startTime}
-                    onChange={e => setStartTime(e.target.value)}
-                />
-                {errors.startTime && <p className={errorCls}>{errors.startTime}</p>}
+                <div className="bg-[#c8cdd8] rounded-2xl px-4 py-3 flex flex-col gap-1">
+                    <label htmlFor="form-reservation-date-field" className="text-xs font-semibold text-[#5a6070] uppercase tracking-widest">Date</label>
+                    <input
+                        id="form-reservation-date-field"
+                        type="date"
+                        value={date}
+                        min={new Date().toISOString().slice(0, 10)}
+                        onChange={e => setDate(e.target.value)}
+                        className="bg-transparent text-[#2e3340] font-medium text-sm outline-none w-full cursor-pointer"
+                    />
+                </div>
 
-                <label className="font-bold" htmlFor="form-guest-count-field">Guests</label>
-                <input
-                    id="form-guest-count-field"
-                    className={inputCls}
-                    type="number"
-                    min={1}
-                    max={selectedTable?.capacity ?? 20}
-                    value={guestCount}
-                    onChange={e => setGuestCount(Number(e.target.value))}
-                />
-                {errors.guestCount && <p className={errorCls}>{errors.guestCount}</p>}
+                <div className="bg-[#c8cdd8] rounded-2xl px-4 py-3 flex flex-col gap-1">
+                    <label htmlFor="form-reservation-time-field" className="text-xs font-semibold text-[#5a6070] uppercase tracking-widest">Time</label>
+                    <input
+                        id="form-reservation-time-field"
+                        type="time"
+                        value={startTime}
+                        onChange={e => setStartTime(e.target.value)}
+                        className="bg-transparent text-[#2e3340] font-medium text-sm outline-none w-full cursor-pointer"
+                    />
+                    {errors.startTime && <p className="text-xs text-red-500 mt-0.5">{errors.startTime}</p>}
+                </div>
+
+                <div className="bg-[#c8cdd8] rounded-2xl px-4 py-3 flex flex-col gap-1">
+                    <label htmlFor="form-guest-count-field" className="text-xs font-semibold text-[#5a6070] uppercase tracking-widest">Guests</label>
+                    <input
+                        id="form-guest-count-field"
+                        type="number"
+                        min={1}
+                        max={selectedTable?.capacity ?? 20}
+                        value={guestCount}
+                        onChange={e => setGuestCount(Number(e.target.value))}
+                        className="bg-transparent text-[#2e3340] font-medium text-sm outline-none w-full"
+                    />
+                    {errors.guestCount && <p className="text-xs text-red-500 mt-0.5">{errors.guestCount}</p>}
+                </div>
 
             </div>
 
             {apiError && (
-                <p className="text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2 mt-4">
-                    {apiError}
-                </p>
+                <p className="text-xs text-red-500 font-medium text-center">{apiError}</p>
             )}
 
-            <div className="flex gap-3 mt-[2em]">
+            <div className="flex gap-3">
                 {onCancel && (
                     <button
                         type="button"
                         onClick={onCancel}
                         disabled={loading}
-                        className="font-bold bg-gray-400 p-[2em] w-full rounded-xl disabled:opacity-50"
+                        className="w-full py-3 rounded-2xl font-semibold text-sm tracking-wide bg-[#c8cdd8] text-[#3a3f4a] hover:bg-[#bcc2ce] active:scale-[0.98] disabled:opacity-50 transition-all duration-150"
                     >
                         Cancel
                     </button>
@@ -211,7 +225,7 @@ export default function ReservationForm({
                     type="button"
                     onClick={handleSubmit}
                     disabled={loading || !selectedTable}
-                    className="font-bold bg-gray-400 p-[2em] w-full rounded-xl disabled:opacity-50"
+                    className="w-full py-3 rounded-2xl font-semibold text-sm tracking-wide bg-green-400 text-white hover:bg-green-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
                 >
                     {loading ? "Confirming…" : "Confirm"}
                 </button>

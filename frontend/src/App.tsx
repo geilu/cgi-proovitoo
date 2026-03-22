@@ -52,8 +52,8 @@ function App() {
                     <div className="mt-[4.5em] text-center">
                         {loadReservationInfo()}
                     </div>
-                    <button className="p-[2em] rounded-xl bg-blue-500" onClick={() => setFormOpen(true)}>
-                        make reservation
+                    <button className="w-full py-5 rounded-2xl font-semibold text-sm tracking-wide bg-green-400 text-white hover:bg-green-600 " onClick={() => setFormOpen(true)}>
+                        Make Reservation
                     </button>
                 </div>
                 <div id="layout-middle" className="flex flex-col gap-[1em] min-w-[35em]">
