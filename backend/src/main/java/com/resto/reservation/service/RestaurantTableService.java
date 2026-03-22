@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,17 +26,21 @@ public class RestaurantTableService {
 
     public List<RestaurantTable> filterTables(ZonedDateTime time, List<UserPreferences> userPreferences, Integer groupSize) {
         List<RestaurantTable> filteredTables = new ArrayList<>();
+        boolean capacityFiltered = false;
 
         if (groupSize != null) {
             filteredTables = restaurantTableRepo.getByCapacityGreaterThanEqual(groupSize);
+            capacityFiltered = true;
         }
         if (time != null) {
-            List<RestaurantTable> availableTables = restaurantTableRepo.findAvailableTablesAtTime(time);
-            if (filteredTables.isEmpty()) {
-                filteredTables.addAll(availableTables);
+            ZonedDateTime endTime = time.plusHours(2);
+            List<RestaurantTable> availableTables = restaurantTableRepo.findAvailableTablesInRange(time, endTime);
+            Set<Long>availableIds = availableTables.stream().map(RestaurantTable::getId).collect(Collectors.toSet());
+            if (!capacityFiltered) {
+                filteredTables = new ArrayList<>(availableTables);
             } else {
                 filteredTables = filteredTables.stream()
-                        .filter(availableTables::contains)
+                        .filter(t -> availableIds.contains(t.getId()))
                         .collect(Collectors.toList());
             }
         }
@@ -48,7 +53,7 @@ public class RestaurantTableService {
         return filteredTables;
     }
 
-    public RestaurantTable getRecommendedTable(List<RestaurantTable> filteredTables, List<UserPreferences> userPreferences) {
+    public RestaurantTable getRecommendedTable(List<RestaurantTable> filteredTables, List<UserPreferences> userPreferences, Integer groupSize) {
         List<RestaurantTable> tableList = filteredTables;
 
         if (userPreferences != null && !userPreferences.isEmpty()) {
@@ -59,7 +64,7 @@ public class RestaurantTableService {
         }
 
         return tableList.stream()
-                .min(Comparator.comparingInt(RestaurantTable::getCapacity))
+                .min(Comparator.comparingInt(t -> Math.abs(t.getCapacity() - groupSize)))
                 .orElse(null);
     }
 
@@ -70,14 +75,10 @@ public class RestaurantTableService {
             preferredTables.addAll(restaurantTableRepo.getByPositionIn(zoneBounds.getxMin(), zoneBounds.getyMin(), zoneBounds.getxMax(), zoneBounds.getyMax()));
         }
 
-        if (filteredTables.isEmpty()) {
-            return new ArrayList<>(preferredTables);
-        } else {
-            filteredTables = filteredTables.stream()
-                    .filter(preferredTables::contains)
-                    .collect(Collectors.toList());
-        }
+        Set<Long> preferredIds = preferredTables.stream().map(RestaurantTable::getId).collect(Collectors.toSet());
 
-        return filteredTables;
+        return filteredTables.stream()
+                .filter(t -> preferredIds.contains(t.getId()))
+                .collect(Collectors.toList());
     }
 }

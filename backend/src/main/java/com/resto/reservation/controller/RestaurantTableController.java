@@ -82,7 +82,7 @@ public class RestaurantTableController {
                     schema = @Schema(type = "string", format = "date-time")
             )@RequestParam("time") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime time) {
         ZonedDateTime utc = time.withZoneSameInstant(ZoneOffset.UTC);
-        return ResponseEntity.ok(tableRepo.findAvailableTablesAtTime(utc));
+        return ResponseEntity.ok(tableRepo.findAvailableTablesInRange(utc, utc.plusHours(2)));
     }
 
     @Operation(summary = "Get a list of tables matching the specified filters",
@@ -138,7 +138,7 @@ public class RestaurantTableController {
         RestaurantTable recommendedTable = null;
 
         if (time != null && groupSize != null && !filteredTables.isEmpty()) {
-            recommendedTable = restaurantTableService.getRecommendedTable(filteredTables, userPreferences);
+            recommendedTable = restaurantTableService.getRecommendedTable(filteredTables, userPreferences, groupSize);
         }
         return ResponseEntity.ok(new FilteredTableResponse(filteredTables, recommendedTable));
     }

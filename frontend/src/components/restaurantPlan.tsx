@@ -3,7 +3,11 @@ import {useEffect, useState} from "react";
 import {RestaurantTable} from "../types/RestaurantTable.ts";
 import GridBlock from "./gridBlock.tsx";
 
-export default function RestaurantPlan({ onSelect } : Readonly<{ onSelect: (item: RestaurantTable) => void }>) {
+export default function RestaurantPlan({ onSelect, filteredIds, recommendedId} : Readonly<{
+    onSelect: (item: RestaurantTable) => void
+    filteredIds: number[] | null,
+    recommendedId: number | null
+    }>) {
 
     const [tables, setTables] = useState<RestaurantTable[]>([])
     const [error, setError] = useState<string | null>(null);
@@ -36,7 +40,14 @@ export default function RestaurantPlan({ onSelect } : Readonly<{ onSelect: (item
         for (let col = 1; col <= 6; col++) {
             const table = tableMap.get(`${col},${row}`);
             cells.push(
-                table ? <TableObject key={`${col},${row}`} table={table} onClick={() => onSelect(table)} /> : <GridBlock key={`${col},${row}`} />
+                table
+                    ? <TableObject
+                    key={`${col},${row}`}
+                    table={table}
+                    onClick={() => onSelect(table)}
+                    dimmed={filteredIds !== null && !filteredIds.includes(table.id)}
+                    recommended={table.id === recommendedId}/>
+                    : <GridBlock key={`${col},${row}`} />
             )
         }
     }

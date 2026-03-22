@@ -39,6 +39,7 @@ class RestaurantTableServiceTests {
     void setup() {
         // terrace zone
         table1 = new RestaurantTable();
+        table1.setId(1L);
         table1.setX(1);
         table1.setY(1);
         table1.setCapacity(4);
@@ -46,6 +47,7 @@ class RestaurantTableServiceTests {
 
         // terrace zone
         table2 = new RestaurantTable();
+        table2.setId(2L);
         table2.setX(5);
         table2.setY(2);
         table2.setCapacity(6);
@@ -53,6 +55,7 @@ class RestaurantTableServiceTests {
 
         // quiet zone
         table3 = new RestaurantTable();
+        table3.setId(3L);
         table3.setX(5);
         table3.setY(5);
         table3.setCapacity(2);
@@ -82,12 +85,12 @@ class RestaurantTableServiceTests {
 
     @Test
     void filterTables_timeOnly() {
-        when(restaurantTableRepo.findAvailableTablesAtTime(testTime)).thenReturn(List.of(table1, table3));
+        when(restaurantTableRepo.findAvailableTablesInRange(testTime, testTime.plusHours(2))).thenReturn(List.of(table1, table3));
 
         List<RestaurantTable> result = restaurantTableService.filterTables(testTime, null, null);
 
         assertThat(result).containsExactlyInAnyOrder(table1, table3);
-        verify(restaurantTableRepo).findAvailableTablesAtTime(testTime);
+        verify(restaurantTableRepo).findAvailableTablesInRange(testTime, testTime.plusHours(2));
         verify(restaurantTableRepo, never()).getByCapacityGreaterThanEqual(any());
         verifyNoInteractions(zoneService);
     }
@@ -138,13 +141,13 @@ class RestaurantTableServiceTests {
     @Test
     void filterTables_groupSizeAndTime() {
         when(restaurantTableRepo.getByCapacityGreaterThanEqual(4)).thenReturn(List.of(table1, table2));
-        when(restaurantTableRepo.findAvailableTablesAtTime(testTime)).thenReturn(List.of(table2, table3));
+        when(restaurantTableRepo.findAvailableTablesInRange(testTime, testTime.plusHours(2))).thenReturn(List.of(table2, table3));
 
         List<RestaurantTable> result = restaurantTableService.filterTables(testTime, null, 4);
 
         assertThat(result).containsExactly(table2);
 
-        RestaurantTable recommended = restaurantTableService.getRecommendedTable(result, null);
+        RestaurantTable recommended = restaurantTableService.getRecommendedTable(result, null, 4);
         assertThat(recommended).isEqualTo(table2);
     }
 
@@ -157,7 +160,7 @@ class RestaurantTableServiceTests {
         bounds.setyMax(2);
         bounds.setyMin(1);
 
-        when(restaurantTableRepo.findAvailableTablesAtTime(testTime)).thenReturn(List.of(table3));
+        when(restaurantTableRepo.findAvailableTablesInRange(testTime, testTime.plusHours(2))).thenReturn(List.of(table3));
         when(zoneService.getZoneBounds("TERRACE")).thenReturn(bounds);
         when(restaurantTableRepo.getByPositionIn(1, 1, 6, 2)).thenReturn(List.of(table1, table2));
 
@@ -168,13 +171,13 @@ class RestaurantTableServiceTests {
 
     @Test
     void getRecommendedTable_nullWhenFilteredTablesEmpty() {
-        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(), null);
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(), null, 4);
         assertNull(result);
     }
 
     @Test
     void getRecommendedTable_noPreferences() {
-        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), null);
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), null, 4);
         assertEquals(result, table1);
     }
 
@@ -190,7 +193,7 @@ class RestaurantTableServiceTests {
         when(restaurantTableRepo.getByPositionIn(4, 3, 6, 6)).thenReturn(List.of(table3));
         when(restaurantTableService.applyUserPreferenceFilter(List.of(table2, table3), userPreferences)).thenReturn(List.of(table3));
 
-        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table2, table3), userPreferences);
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table2, table3), userPreferences, 2);
 
         assertEquals(result, table3);
     }
@@ -207,7 +210,7 @@ class RestaurantTableServiceTests {
         when(restaurantTableRepo.getByPositionIn(4, 3, 6, 6)).thenReturn(List.of());
         when(restaurantTableService.applyUserPreferenceFilter(List.of(table1, table2), userPreferences)).thenReturn(List.of());
 
-        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), userPreferences);
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), userPreferences, 4);
         assertEquals(result, table1);
     }
 
@@ -223,7 +226,7 @@ class RestaurantTableServiceTests {
         when(restaurantTableRepo.getByPositionIn(1, 1, 6, 2)).thenReturn(List.of(table1, table2));
         when(restaurantTableService.applyUserPreferenceFilter(List.of(table1, table2), userPreferences)).thenReturn(List.of(table1, table2));
 
-        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), userPreferences);
+        RestaurantTable result = restaurantTableService.getRecommendedTable(List.of(table1, table2), userPreferences, 4);
 
         assertEquals(result, table1);
     }

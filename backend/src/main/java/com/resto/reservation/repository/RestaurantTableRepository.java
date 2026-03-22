@@ -15,10 +15,10 @@ public interface RestaurantTableRepository extends JpaRepository<RestaurantTable
     SELECT t FROM RestaurantTable t
     WHERE t.id NOT IN (
         SELECT r.restaurantTable.id FROM Reservation r
-        WHERE r.startTime <= :time AND r.endTime >= :time
+        WHERE r.startTime <= :endTime AND r.endTime > :startTime
     )
     """)
-    List<RestaurantTable> findAvailableTablesAtTime(@Param("time")ZonedDateTime time);
+    List<RestaurantTable> findAvailableTablesInRange(@Param("startTime") ZonedDateTime startTime, @Param("endTime") ZonedDateTime endTime);
 
     List<RestaurantTable> getByCapacityGreaterThanEqual(Integer groupSize);
 
