@@ -53,7 +53,7 @@ export default function RestaurantPlan({ onSelect, filteredIds, recommendedId} :
     }
 
     return (
-        <div className="grid grid-cols-6 gap-10">
+        <div className="grid grid-cols-6 gap-3 gap-y-4">
             {cells}
         </div>
     )

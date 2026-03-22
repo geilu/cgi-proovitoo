@@ -1,4 +1,8 @@
 import {RestaurantTable} from "../types/RestaurantTable.ts";
+// @ts-ignore
+import TableObj from "../resources/tableObj.svg";
+// @ts-ignore
+import TableObjRecommended from "../resources/tableObjRecommended.svg";
 
 export default function TableObject({table, onClick, dimmed, recommended} : Readonly<{
     table: RestaurantTable,
@@ -6,12 +10,16 @@ export default function TableObject({table, onClick, dimmed, recommended} : Read
     dimmed?: boolean,
     recommended?: boolean
     }>) {
+
     return (
-        <button className={`bg-green-500 py-[1em] px-[1.5em] rounded-xl 
-        ${recommended ? "bg-yellow-500" : "bg-green-500"}
+        <button
+            id={`table-${table.id}`}
+            className={`table-obj relative inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer
         ${dimmed ? "opacity-30" : "opacity-100"}`}
-                onClick={onClick}>
-            <span>{table.capacity}</span>
+            onClick={onClick}
+        >
+            <img src={recommended ? TableObjRecommended : TableObj} alt="table" />
+            <span className="absolute font-bold">{table.capacity}</span>
         </button>
     )
 }
