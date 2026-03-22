@@ -17,7 +17,7 @@ function toISODateTime(localDatetime: string): string {
 }
 
 export default function FilterBlock({ onFilter }: Readonly<{ onFilter: (result: FilteredTableResponse) => void }>) {
-    const [date, setDate] = useState("");
+    const [date, setDate] = useState(TODAY);
     const [timeOfDay, setTimeOfDay] = useState("");
     const [groupSize, setGroupSize] = useState("");
     const [zones, setZones] = useState<string[]>([]);
