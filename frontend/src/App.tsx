@@ -25,7 +25,7 @@ function App() {
 
     return(
         <div className="flex flex-row flex-1 w-full justify-center gap-[2em] mt-[5em]">
-            <div id="grid-container" className="flex p-[20em] bg-green-400 rounded-xl">
+            <div id="grid-container" className="flex p-[3em] bg-green-400 rounded-xl">
                 <RestaurantPlan onSelect={setSelectedTable} />
             </div>
             <div id="layout-right" className="flex flex-col gap-[2em]">
