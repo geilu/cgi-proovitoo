@@ -7,16 +7,31 @@ const ZONES = [
     { value: "TERRACE", label: "Terrace Area" },
 ];
 
+const TODAY = new Date().toLocaleDateString('en-CA');
+
 function toISODateTime(localDatetime: string): string {
-    return new Date(localDatetime).toISOString();
+    const normalized = /^\d{4}-\d{2}-\d{2}$/.test(localDatetime)
+        ? localDatetime + "T00:00"
+        : localDatetime;
+    return new Date(normalized).toISOString();
 }
 
 export default function FilterBlock({ onFilter }: Readonly<{ onFilter: (result: FilteredTableResponse) => void }>) {
-    const [time, setTime] = useState("");
+    const [date, setDate] = useState("");
+    const [timeOfDay, setTimeOfDay] = useState("");
     const [groupSize, setGroupSize] = useState("");
     const [zones, setZones] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    const selectedTime = date && timeOfDay
+        ? `${date}T${timeOfDay}`
+        : date
+            ? date
+            : timeOfDay
+                ? `${today}T${timeOfDay}`  // default to today when only time is picked
+                : "";
 
     const parsedGroupSize = groupSize === "" ? null : parseInt(groupSize, 10);
 
@@ -28,15 +43,16 @@ export default function FilterBlock({ onFilter }: Readonly<{ onFilter: (result: 
         setError(null);
         try {
             const params = new URLSearchParams();
-            if (time) params.set("time", toISODateTime(time));
+            if (selectedTime) params.set("time", toISODateTime(selectedTime));
             if (parsedGroupSize !== null && parsedGroupSize > 0)params.set("groupSize", String(parsedGroupSize));
             zones.forEach(z => params.append("userPreferences", z));
 
             const response = await fetch(`/api/tables/filtered?${params}`);
             if (!response.ok) throw new Error("Failed to fetch filtered tables");
             const data: FilteredTableResponse = await response.json();
+            data.selectedTime = selectedTime;
             onFilter(data);
-        } catch (err) {
+        } catch {
             setError("Could not apply filters");
         } finally {
             setLoading(false);
@@ -50,9 +66,15 @@ export default function FilterBlock({ onFilter }: Readonly<{ onFilter: (result: 
             <div className="flex flex-col justify-evenly h-full">
                 <div className="flex flex-col gap-[1em]">
                     <span id="filter-field-container">
+                        <label htmlFor="reservation-date-filter" className="w-full text-end font-bold">Reservation Date</label>
+                        <input id="reservation-date-filter" type="date" className="border-[2px] p-[0.1em]"
+                            value={date} onChange={e => setDate(e.target.value)}/>
+                    </span>
+
+                    <span id="filter-field-container">
                         <label htmlFor="reservation-time-filter" className="w-full text-end font-bold">Reservation Time</label>
-                        <input id="reservation-time-filter" type="datetime-local" className="border-[2px] p-[0.1em]"
-                            value={time} onChange={e => setTime(e.target.value)}/>
+                        <input id="reservation-time-filter" type="time" className="border-[2px] p-[0.1em]"
+                            value={timeOfDay} onChange={e => setTimeOfDay(e.target.value)} />
                     </span>
 
                     <span id="filter-field-container">

@@ -20,7 +20,7 @@ function App() {
             )
         } else {
             return (
-            <ReservationInfoBlock table={selectedTable} />
+            <ReservationInfoBlock table={selectedTable} filterTime={filterResult?.selectedTime} />
             )
         }
     }

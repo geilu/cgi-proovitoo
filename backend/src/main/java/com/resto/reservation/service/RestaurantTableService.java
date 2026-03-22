@@ -25,6 +25,7 @@ public class RestaurantTableService {
     }
 
     public List<RestaurantTable> filterTables(ZonedDateTime time, List<UserPreferences> userPreferences, Integer groupSize) {
+        if (time == null && userPreferences == null && groupSize == null) return restaurantTableRepo.findAll();
         List<RestaurantTable> filteredTables = new ArrayList<>();
         boolean capacityFiltered = false;
 
