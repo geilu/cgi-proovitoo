@@ -51,6 +51,7 @@ export default function FilterBlock({ onFilter }: Readonly<{ onFilter: (result: 
             if (!response.ok) throw new Error("Failed to fetch filtered tables");
             const data: FilteredTableResponse = await response.json();
             data.selectedTime = selectedTime;
+            data.guestCount = parsedGroupSize ?? 2;
             onFilter(data);
         } catch {
             setError("Could not apply filters");

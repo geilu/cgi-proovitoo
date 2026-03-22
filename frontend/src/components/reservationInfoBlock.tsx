@@ -68,7 +68,7 @@ export default function ReservationInfoBlock( {table, filterTime} : Readonly<Res
             {visibleEntries.length === 0 && (<p>{filteredDateKey ? `No reservations on ${formatKey(filteredDateKey)}` : "No reservations"}</p>)}
             {visibleEntries.map(([key, dayReservations]) => (
                 <div key={key} className="flex flex-col gap-2">
-                    <b>Reserved on {formatKey(key)}:</b>
+                    <b>Reserved on {formatKey(key)} during:</b>
                     {dayReservations.map(reservation => {
                         return (
                             <p key={reservation.id}>{formatTime(reservation.startTime)} - {formatTime(reservation.endTime)}</p>
