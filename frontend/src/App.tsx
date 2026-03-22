@@ -34,19 +34,29 @@ function App() {
     const loadReservationInfo = () => {
         if (selectedTable === null) {
             return (
-            <p className="font-bold text-lg">Select a table to see its reservation info</p>
+                <div className="bg-[#d6dae3] rounded-xl p-[1em] w-[20em]">
+                    <p className="font-semibold text-lg text-[#2e3340]">Select a table to see its reservation info</p>
+                </div>
             )
         } else {
             return (
-            <ReservationInfoBlock table={selectedTable} filterTime={filterResult?.selectedTime} />
+                <ReservationInfoBlock table={selectedTable} filterTime={filterResult?.selectedTime} />
             )
         }
     }
 
     return(
         <>
-            <div className="flex flex-row flex-1 w-full justify-center gap-[2em] mt-[5em] overflow-visible">
-                <div id="layout-left" className="flex flex-col gap-[1em]">
+            <div className="flex flex-row flex-1 w-full gap-[2em] m-[5em] mx-[1em] justify-center">
+                <div id="layout-left" className="flex flex-col justify-between gap-[3em]">
+                    <div className="mt-[4.5em] text-center">
+                        {loadReservationInfo()}
+                    </div>
+                    <button className="p-[2em] rounded-xl bg-blue-500" onClick={() => setFormOpen(true)}>
+                        make reservation
+                    </button>
+                </div>
+                <div id="layout-middle" className="flex flex-col gap-[1em] min-w-[35em]">
 
                     <div id="legend" className="flex flex-row justify-evenly p-[0.5em]">
                         <div className="flex flex-row gap-[0.5em] text-center">
@@ -74,16 +84,8 @@ function App() {
                                         recommendedId={filterResult?.recommendedTable?.id ?? null}/>
                     </div>
                 </div>
-
-                <div id="layout-right" className="flex flex-col gap-[2em]">
-                    <div id="filter-container" className="h-full w-full">
-                        <FilterBlock onFilter={setFilterResult} />
-                    </div>
-                    <div id="reservation-info-container" className="bg-blue-400 rounded-xl h-full w-full min-w-[26em] p-[2em] text-center content-center">
-                        {loadReservationInfo()}
-                    </div>
-                    <button className="p-[2em] rounded-xl bg-blue-500"
-                                onClick={() => setFormOpen(true)}>make reservation</button>
+                <div id="filter-container" className="h-full mt-[4.5em] w-[20em]">
+                    <FilterBlock onFilter={setFilterResult} />
                 </div>
             </div>
             <ReservationForm isOpen={formOpen} selectedTable={selectedTable} filterResult={filterResult} user={testUser} onCancel={() => setFormOpen(false)} />
