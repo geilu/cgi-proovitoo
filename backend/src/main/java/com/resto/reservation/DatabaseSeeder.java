@@ -98,21 +98,22 @@ public class DatabaseSeeder implements CommandLineRunner {
         reservationRepo.deleteAll(); // clear reservations and users
         userRepo.deleteAll();
 
-        List<RestaurantTable> tables = tableRepo.findAll();
-        // reservations for three upcoming days
-        generateRandomReservations(20, r, tables, 0);
-        generateRandomReservations(10, r, tables, 1);
-        generateRandomReservations(5, r, tables, 2);
-
-        LOGGER.log(Level.INFO, "Dummy data added to database");
-    }
-
-    private void generateRandomReservations(int count, Random r, List<RestaurantTable> tables, long daysAhead) {
+        // create one shared test user for all seeded reservations
         User user = new User();
         user.setFirstName("Aadu");
         user.setLastName("Beedu");
         userRepo.save(user);
 
+        List<RestaurantTable> tables = tableRepo.findAll();
+        // reservations for three upcoming days
+        generateRandomReservations(20, r, tables, user, 0);
+        generateRandomReservations(10, r, tables, user, 1);
+        generateRandomReservations(5, r, tables, user, 2);
+
+        LOGGER.log(Level.INFO, "Dummy data added to database");
+    }
+
+    private void generateRandomReservations(int count, Random r, List<RestaurantTable> tables, User user, long daysAhead) {
         LocalDate date = LocalDate.now().plusDays(daysAhead);
 
         long durationSeconds = TimeUnit.MINUTES.toSeconds(120);
