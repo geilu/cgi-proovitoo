@@ -124,7 +124,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             RestaurantTable reservationTable = tables.get(r.nextInt(tables.size()));
             reservation.setRestaurantTable(reservationTable);
-            reservation.setGuestCount(r.nextInt(3, reservationTable.getCapacity()+1));
+            reservation.setGuestCount(r.nextInt(2, reservationTable.getCapacity()+1));
 
             boolean overlaps = madeReservations.stream()
                     .filter(slot -> slot.tableId().equals(reservationTable.getId()))
